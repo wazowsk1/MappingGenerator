@@ -11,6 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MappingGenerator.Vsix", "Ma
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MappingGenerator.OnBuildGenerator", "OnBuildGenerator\MappingGenerator.OnBuildGenerator.csproj", "{D9DF08C9-15B7-4DE7-8D1E-BDB5C7CD883F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartCodeGenerator.Engine", "..\..\CodeGeneration.Roslyn\src\SmartCodeGenerator.Engine\SmartCodeGenerator.Engine.csproj", "{B18D2DD5-C06C-41ED-A03B-22C04770D351}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartCodeGenerator.Sdk", "..\..\CodeGeneration.Roslyn\src\SmartCodeGenerator.Sdk\SmartCodeGenerator.Sdk.csproj", "{0A96742E-A395-4097-8F44-B131AF00CB20}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartCodeGenerator.TestKit", "..\..\CodeGeneration.Roslyn\src\SmartCodeGenerator.TestKit\SmartCodeGenerator.TestKit.csproj", "{2F800DA5-9305-4436-B8E2-16F99458A290}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +39,18 @@ Global
 		{D9DF08C9-15B7-4DE7-8D1E-BDB5C7CD883F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9DF08C9-15B7-4DE7-8D1E-BDB5C7CD883F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9DF08C9-15B7-4DE7-8D1E-BDB5C7CD883F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B18D2DD5-C06C-41ED-A03B-22C04770D351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B18D2DD5-C06C-41ED-A03B-22C04770D351}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B18D2DD5-C06C-41ED-A03B-22C04770D351}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B18D2DD5-C06C-41ED-A03B-22C04770D351}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A96742E-A395-4097-8F44-B131AF00CB20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A96742E-A395-4097-8F44-B131AF00CB20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A96742E-A395-4097-8F44-B131AF00CB20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A96742E-A395-4097-8F44-B131AF00CB20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F800DA5-9305-4436-B8E2-16F99458A290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F800DA5-9305-4436-B8E2-16F99458A290}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F800DA5-9305-4436-B8E2-16F99458A290}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F800DA5-9305-4436-B8E2-16F99458A290}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
