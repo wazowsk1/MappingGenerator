@@ -1,16 +1,16 @@
-﻿using System;
-using System.Linq;
-using MappingGenerator.RoslynHelpers;
+﻿using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using System;
+using System.Linq;
 
 namespace MappingGenerator.Mappings
 {
-    public class CloneMappingEngine: MappingEngine
+    public class CloneMappingEngine : MappingEngine
     {
-        public CloneMappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly) 
+        public CloneMappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly)
             : base(semanticModel, syntaxGenerator, contextAssembly)
         {
         }
@@ -22,16 +22,15 @@ namespace MappingGenerator.Mappings
                 return false;
             }
 
-            return  ObjectHelper.IsSimpleType(targetType) == false && ObjectHelper.IsSimpleType(sourceType) == false;
+            return ObjectHelper.IsSimpleType(targetType) == false && ObjectHelper.IsSimpleType(sourceType) == false;
         }
 
-        protected override MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, MappingPath mappingPath)
+        protected override MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, bool skipCollections, MappingPath mappingPath)
         {
             //TODO: check if source is not null (conditional member access)
 
-            if (mappingPath.Length > 1 && source.ExpressionType.AllInterfaces.Any(x => x.Name == "ICloneable") && source.ExpressionType.SpecialType!=SpecialType.System_Array)
+            if (mappingPath.Length > 1 && source.ExpressionType.AllInterfaces.Any(x => x.Name == "ICloneable") && source.ExpressionType.SpecialType != SpecialType.System_Array)
             {
-
                 var invokeClone = syntaxGenerator.InvocationExpression(syntaxGenerator.MemberAccessExpression(source.Expression, "Clone"));
                 var cloneMethods = targetType.GetMembers("Clone");
                 if (cloneMethods.Any(IsGenericCloneMethod))
@@ -47,9 +46,9 @@ namespace MappingGenerator.Mappings
 
                 if (objectClone != null)
                 {
-                    var objectCLoneMethod = (IMethodSymbol) objectClone;
+                    var objectCLoneMethod = (IMethodSymbol)objectClone;
 
-                    if(CanBeAccessedInCurrentContext(objectCLoneMethod) )
+                    if (CanBeAccessedInCurrentContext(objectCLoneMethod))
                     {
                         return new MappingElement()
                         {
@@ -60,7 +59,7 @@ namespace MappingGenerator.Mappings
                 }
 
                 var implicitClone = targetType.GetMembers("System.ICloneable.Clone").FirstOrDefault();
-                if (implicitClone!=null)
+                if (implicitClone != null)
                 {
                     var castedOnICloneable = syntaxGenerator.CastExpression(SyntaxFactory.ParseTypeName("ICloneable"), source.Expression);
                     return new MappingElement()
@@ -68,11 +67,10 @@ namespace MappingGenerator.Mappings
                         ExpressionType = targetType,
                         Expression = syntaxGenerator.TryCastExpression(syntaxGenerator.InvocationExpression(syntaxGenerator.MemberAccessExpression(castedOnICloneable, "Clone")), targetType) as ExpressionSyntax
                     };
-
                 }
             }
 
-            return base.TryToCreateMappingExpression(source, targetType, mappingPath);
+            return base.TryToCreateMappingExpression(source, targetType, skipCollections, mappingPath);
         }
 
         private bool IsGenericCloneMethod(ISymbol x)
@@ -85,7 +83,7 @@ namespace MappingGenerator.Mappings
 
         private bool CanBeAccessedInCurrentContext(IMethodSymbol objectCLoneMethod)
         {
-            return objectCLoneMethod.DeclaredAccessibility == Accessibility.Public || 
+            return objectCLoneMethod.DeclaredAccessibility == Accessibility.Public ||
                    (objectCLoneMethod.DeclaredAccessibility == Accessibility.Internal && objectCLoneMethod.ContainingAssembly.IsSameAssemblyOrHasFriendAccessTo(contextAssembly));
         }
     }

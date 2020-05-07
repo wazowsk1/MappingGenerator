@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using MappingGenerator.Mappings.MappingImplementors;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
@@ -7,6 +5,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MappingGenerator.Mappings
 {
@@ -19,7 +19,6 @@ namespace MappingGenerator.Mappings
 
         public bool CanProvideMappingImplementationFor(IMethodSymbol methodSymbol)
         {
-
             if (IsCompleteMethodDeclarationSymbol(methodSymbol) == false)
             {
                 return false;
@@ -41,6 +40,7 @@ namespace MappingGenerator.Mappings
         private readonly IReadOnlyList<IMappingMethodImplementor> implementors = new List<IMappingMethodImplementor>()
         {
             new IdentityMappingMethodImplementor(),
+            new SingleParameterForeachMappingMethodImplementor(),
             new SingleParameterPureMappingMethodImplementor(),
             new MultiParameterPureMappingMethodImplementor(),
             new FallbackMappingImplementor(new UpdateSecondParameterMappingMethodImplementor(),new UpdateThisObjectMultiParameterMappingMethodImplementor()),
