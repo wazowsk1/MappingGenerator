@@ -318,10 +318,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    public class Person
         ///    {
         ///        public int Age { get; set; }
-        ///        public string FirstName { get; set; }
-        ///        public string LastName { get; set; }
+        ///        public string Name { get; set; }
         ///
-        ///        public void [|Update|](int age, string firstName, string lastName)
+        ///        public void [|Update|](int age, string name)
         ///        {
         ///        }
         ///    }
@@ -339,14 +338,12 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    public class Person
         ///    {
         ///        public int Age { get; set; }
-        ///        public string FirstName { get; set; }
-        ///        public string LastName { get; set; }
+        ///        public string Name { get; set; }
         ///
-        ///        public void Update(int age, string firstName, string lastName)
+        ///        public void Update(int age, string name)
         ///        {
         ///            Age = age;
-        ///            FirstName = firstName;
-        ///            LastName = lastName;
+        ///            Name = name;
         ///        }
         ///    }
         ///}.
@@ -684,9 +681,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; categories)
         ///        {
+        ///            throw new NotImplementedException();
         ///        }
-        ///    }
-        ///}.
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _012_CollectionMappingWithSingularLambdaParameterName {
             get {
@@ -814,9 +811,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;ZZ&gt; [|MapNew|](List&lt;XX&gt; dictionary)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw n [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _014_CollectionMappingWithGenericName {
             get {
@@ -880,9 +875,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;ZZ&gt; [|MapNew|](List&lt;XX&gt; usersList)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw ne [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _015_CollectionMappingWithPostfixGenericName {
             get {
@@ -945,9 +938,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; people)
         ///        {
+        ///            throw new NotImplementedException();
         ///        }
-        ///    }
-        ///}.
+        ///     [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _016_CollectionMappingWithIrregularSingularLambdaParameterName {
             get {
@@ -1010,9 +1003,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; relatedPeople)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw new NotImplementedException();
+        ///         [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _017_CollectionMappingWithIrregularCamelCaseSingularLambdaParameterName {
             get {
@@ -1075,9 +1067,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;ZZ&gt; [|MapNew|](List&lt;XX&gt; userList)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw new [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _018_CollectionMappingWithPostfixGenericNameInSingular {
             get {
@@ -1305,9 +1295,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](IList&lt;XX&gt; categories)
         ///        {
-        ///            throw new NotImplementedException()
-        ///        }
-        /// [rest of string was truncated]&quot;;.
+        ///            throw new NotImplementedException();
+        ///        }        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _022_CollectionMappingIListToList {
             get {
@@ -1603,6 +1592,350 @@ namespace MappingGenerator.Test.MappingGenerator {
         internal static string _027_ConstructorWithSingleParameter_FIXED {
             get {
                 return ResourceManager.GetString("_027_ConstructorWithSingleParameter_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public List&lt;int&gt; LuckyNumbers { get; } = new List&lt;int&gt;();
+        ///    }
+        ///
+        ///    public cl [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _028_ForeachMappingForSimpleType {
+            get {
+                return ResourceManager.GetString("_028_ForeachMappingForSimpleType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            var userDTO = new UserDTO()
+        ///            {
+        ///                Age = entity.Age
+        ///            };
+        ///            userDTO.LuckyNumbers.AddRange(entity.LuckyNumbers);
+        ///            return userDTO;
+        ///        }
+        ///    }
+        ///
+        ///    public cla [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _028_ForeachMappingForSimpleType_FIXED {
+            get {
+                return ResourceManager.GetString("_028_ForeachMappingForSimpleType_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public List&lt;AccountDTO&gt; Accounts { get; } = new List&lt;AccountDTO&gt;();
+        ///    }
+        ///
+        ///    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _029_ForeachMapping {
+            get {
+                return ResourceManager.GetString("_029_ForeachMapping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            var userDTO = new UserDTO()
+        ///            {
+        ///                Age = entity.Age
+        ///            };
+        ///            foreach (var account in entity.Accounts)
+        ///            {
+        ///                var accountDTO = new AccountDTO()
+        ///         [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _029_ForeachMapping_FIXED {
+            get {
+                return ResourceManager.GetString("_029_ForeachMapping_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public List&lt;AccountDTO&gt; Accounts { get; } = new List&lt;AccountDTO&gt;();
+        ///    }
+        ///
+        ///    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _030_ForeachMappingForNestedObject {
+            get {
+                return ResourceManager.GetString("_030_ForeachMappingForNestedObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            var userDTO = new UserDTO()
+        ///            {
+        ///                Age = entity.Age
+        ///            };
+        ///            foreach (var account in entity.Accounts)
+        ///            {
+        ///                var accountDTO = new AccountDTO()
+        ///         [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _030_ForeachMappingForNestedObject_FIXED {
+            get {
+                return ResourceManager.GetString("_030_ForeachMappingForNestedObject_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public List&lt;AccountDTO&gt; Accounts { get; set; }
+        ///    }
+        ///
+        ///    public class UserEnt [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _031_ForeachMappingForNestedObjectLevel2 {
+            get {
+                return ResourceManager.GetString("_031_ForeachMappingForNestedObjectLevel2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            var userDTO = new UserDTO()
+        ///            {
+        ///                Age = entity.Age
+        ///            };
+        ///            foreach (var account in entity.Accounts)
+        ///            {
+        ///                var accountDTO = new AccountDTO()
+        ///         [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _031_ForeachMappingForNestedObjectLevel2_FIXED {
+            get {
+                return ResourceManager.GetString("_031_ForeachMappingForNestedObjectLevel2_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public List&lt;Account&gt; Accounts { get; } = new List&lt;Account&gt;();
+        ///    }
+        ///
+        ///    publi [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _032_ForeachMappingConflictingLocalVariableName {
+            get {
+                return ResourceManager.GetString("_032_ForeachMappingConflictingLocalVariableName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            var userDTO = new UserDTO()
+        ///            {
+        ///                Age = entity.Age
+        ///            };
+        ///            foreach (var account in entity.Accounts)
+        ///            {
+        ///                var accountTarget = new Account()
+        ///         [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _032_ForeachMappingConflictingLocalVariableName_FIXED {
+            get {
+                return ResourceManager.GetString("_032_ForeachMappingConflictingLocalVariableName_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public List&lt;Account&gt; Accounts { get; } = new List&lt;Account&gt;();
+        ///    }
+        ///
+        ///    publi [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _033_ForeachMappingWithDictionary {
+            get {
+                return ResourceManager.GetString("_033_ForeachMappingWithDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            var userDTO = new UserDTO()
+        ///            {
+        ///                Age = entity.Age
+        ///            };
+        ///            foreach (var account in entity.Accounts.Values)
+        ///            {
+        ///                var accountTarget = new Account()
+        ///  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _033_ForeachMappingWithDictionary_FIXED {
+            get {
+                return ResourceManager.GetString("_033_ForeachMappingWithDictionary_FIXED", resourceCulture);
             }
         }
     }

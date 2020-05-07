@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using MappingGenerator.Features.Refactorings;
+﻿using MappingGenerator.Features.Refactorings;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using NUnit.Framework;
 using RoslynTestKit;
+using System.Collections.Generic;
 using static MappingGenerator.Test.MappingGenerator.MappingGeneratorTestCases;
 
 namespace MappingGenerator.Test.Mapping
 {
-    public class MappingGeneratorTests:  CodeRefactoringTestFixture
+    public class MappingGeneratorTests : CodeRefactoringTestFixture
     {
         [Test]
         public void should_be_able_to_generate_pure_mapping_method()
@@ -34,7 +34,6 @@ namespace MappingGenerator.Test.Mapping
         {
             TestCodeRefactoring(_004_UpdateThisObjectWithSingleParameterDecomposition, _004_UpdateThisObjectWithSingleParameterDecomposition_FIXED);
         }
-
 
         [Test]
         public void should_be_able_to_generate_update_this_object_function_with_multiple_parameters()
@@ -90,20 +89,17 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_012_CollectionMappingWithSingularLambdaParameterName, _012_CollectionMappingWithSingularLambdaParameterName_FIXED);
         }
 
-
         [Test]
         public void should_be_able_to_generate_collection_mapping_with_lambda_parameter_name_with_variable_name_as_prefix()
         {
             TestCodeRefactoring(_013_CollectionMappingWithPrefixedLambdaParameterName, _013_CollectionMappingWithPrefixedLambdaParameterName_FIXED_);
         }
 
-
         [Test]
         public void should_be_able_to_generate_collection_mapping_with_lambda_parameter_from_generic_name()
         {
             TestCodeRefactoring(_014_CollectionMappingWithGenericName, _014_CollectionMappingWithGenericName_FIXED);
         }
-
 
         [Test]
         public void should_be_able_to_generate_collection_mapping_with_lambda_parameter_from_postfiex_generic_name()
@@ -177,6 +173,42 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_027_ConstructorWithSingleParameter, _027_ConstructorWithSingleParameter_FIXED);
         }
 
+        [Test]
+        public void should_be_able_to_use_addrange_for_simpletype_get_only_collection()
+        {
+            TestCodeRefactoring(_028_ForeachMappingForSimpleType, _028_ForeachMappingForSimpleType_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_use_add_for_get_only_collection()
+        {
+            TestCodeRefactoring(_029_ForeachMapping, _029_ForeachMapping_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_use_add_for_get_only_collection_with_nested_objects()
+        {
+            TestCodeRefactoring(_030_ForeachMappingForNestedObject, _030_ForeachMappingForNestedObject_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_use_add_for_get_only_collection_with_nested_objects_two_levels_deep()
+        {
+            TestCodeRefactoring(_031_ForeachMappingForNestedObjectLevel2, _031_ForeachMappingForNestedObjectLevel2_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_use_add_for_get_only_collection_conflicting_variable_name()
+        {
+            TestCodeRefactoring(_032_ForeachMappingConflictingLocalVariableName, _032_ForeachMappingConflictingLocalVariableName_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_use_add_for_get_only_collection_from_dictionary_values()
+        {
+            TestCodeRefactoring(_033_ForeachMappingWithDictionary, _033_ForeachMappingWithDictionary_FIXED);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeRefactoringProvider CreateProvider()
@@ -190,4 +222,3 @@ namespace MappingGenerator.Test.Mapping
         };
     }
 }
-
