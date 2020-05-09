@@ -1900,11 +1900,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///    public class UserDTO
         ///    {
-        ///        public int Age { get; set; }
         ///        public List&lt;Account&gt; Accounts { get; } = new List&lt;Account&gt;();
-        ///    }
-        ///
-        ///    publi [rest of string was truncated]&quot;;.
+        ///        public List&lt;Account&gt; Accounts2 { get; } = new Li [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _033_ForeachMappingWithDictionary {
             get {
@@ -1924,18 +1921,70 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    {
         ///        public static UserDTO Map(UserEntity entity)
         ///        {
-        ///            var userDTO = new UserDTO()
-        ///            {
-        ///                Age = entity.Age
-        ///            };
+        ///            var userDTO = new UserDTO();
         ///            foreach (var account in entity.Accounts.Values)
         ///            {
         ///                var accountTarget = new Account()
-        ///  [rest of string was truncated]&quot;;.
+        ///                {
+        ///                    BankName = account.BankNam [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _033_ForeachMappingWithDictionary_FIXED {
             get {
                 return ResourceManager.GetString("_033_ForeachMappingWithDictionary_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public AccountDTO Account { get; set; }
+        ///        public List&lt;AccountDTO&gt; Accounts [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _034_ForeachMappingObjectBeforeList {
+            get {
+                return ResourceManager.GetString("_034_ForeachMappingObjectBeforeList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            var userDTO = new UserDTO()
+        ///            {
+        ///                Age = entity.Age,
+        ///                Account = new AccountDTO()
+        ///                {
+        ///                    BankName = entity.Account.BankName,
+        ///                    Num [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _034_ForeachMappingObjectBeforeList_FIXED {
+            get {
+                return ResourceManager.GetString("_034_ForeachMappingObjectBeforeList_FIXED", resourceCulture);
             }
         }
     }
