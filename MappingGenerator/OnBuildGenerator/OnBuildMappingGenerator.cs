@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using MappingGenerator.Mappings;
+﻿using MappingGenerator.Mappings;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using SmartCodeGenerator.Sdk;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MappingGenerator.OnBuildGenerator
 {
@@ -19,10 +19,35 @@ namespace MappingGenerator.OnBuildGenerator
 
         public Task<GenerationResult> GenerateAsync(CSharpSyntaxNode processedNode, AttributeData markerAttribute, TransformationContext context, CancellationToken cancellationToken)
         {
+            var usings = new List<string>
+            {
+                "System",
+                "System.Linq"
+            };
+
+            var typeMappers = new List<INamedTypeSymbol>();
+            if (!markerAttribute.ConstructorArguments.IsEmpty)
+            {
+                foreach (var typeMappingClass in markerAttribute.ConstructorArguments[0].Values)
+                {
+                    var typeMappingTypeSymbol = (INamedTypeSymbol)typeMappingClass.Value;
+
+                    if (!typeMappingTypeSymbol.IsStatic)
+                    {
+                        continue;
+                    }
+
+                    usings.Add(typeMappingTypeSymbol.ContainingNamespace.ToDisplayString());
+                    typeMappers.Add(typeMappingTypeSymbol);
+                }
+            }
+
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
             var mappingDeclaration = (InterfaceDeclarationSyntax)processedNode;
 
             var interfaceSymbol = context.SemanticModel.GetDeclaredSymbol(mappingDeclaration);
+            usings.Add(interfaceSymbol.ContainingNamespace.ToDisplayString());
+
             var mappingClass = (ClassDeclarationSyntax)syntaxGenerator.ClassDeclaration(
                 mappingDeclaration.Identifier.Text.Substring(1),
                 accessibility: Accessibility.Public,
@@ -36,7 +61,7 @@ namespace MappingGenerator.OnBuildGenerator
                     if (x is MethodDeclarationSyntax methodDeclaration)
                     {
                         var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodDeclaration);
-                        var statements = ImplementorEngine.CanProvideMappingImplementationFor(methodSymbol) ? ImplementorEngine.GenerateMappingStatements(methodSymbol, syntaxGenerator, context.SemanticModel) :
+                        var statements = ImplementorEngine.CanProvideMappingImplementationFor(methodSymbol) ? ImplementorEngine.GenerateMappingStatements(methodSymbol, syntaxGenerator, context.SemanticModel, typeMappers) :
                                 new List<StatementSyntax>()
                                 {
                                     GenerateThrowNotSupportedException(context, syntaxGenerator, methodSymbol.Name)
@@ -54,17 +79,12 @@ namespace MappingGenerator.OnBuildGenerator
                     }
                     return x;
                 }));
-            
+
             var newRoot = WrapInTheSameNamespace(mappingClass, processedNode);
             return Task.FromResult(new GenerationResult()
             {
                 Members = SyntaxFactory.SingletonList(newRoot),
-                Usings = new SyntaxList<UsingDirectiveSyntax>(new[]
-                {
-                    SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System")),
-                    SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Linq")),
-                    SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(interfaceSymbol.ContainingNamespace.ToDisplayString())),
-                })
+                Usings = new SyntaxList<UsingDirectiveSyntax>(usings.Distinct().Select(x => SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(x))))
             });
         }
 
@@ -72,7 +92,7 @@ namespace MappingGenerator.OnBuildGenerator
         {
             var notImplementedExceptionType = context.SemanticModel.Compilation.GetTypeByMetadataName("System.NotSupportedException");
             var createNotImplementedException = syntaxGenerator.ObjectCreationExpression(notImplementedExceptionType,
-                
+
                 syntaxGenerator.LiteralExpression($"'{methodName}' method signature is not supported by {GeneratorName}"));
             return (StatementSyntax)syntaxGenerator.ThrowStatement(createNotImplementedException);
         }

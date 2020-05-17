@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using MappingGenerator.RoslynHelpers;
+﻿using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
+using System.Collections.Generic;
 
 namespace MappingGenerator.Mappings.MappingImplementors
 {
-    class ThisObjectToOtherMappingMethodImplementor:IMappingMethodImplementor
+    internal class ThisObjectToOtherMappingMethodImplementor : IMappingMethodImplementor
     {
         public bool CanImplement(IMethodSymbol methodSymbol)
         {
@@ -17,9 +17,9 @@ namespace MappingGenerator.Mappings.MappingImplementors
                    ObjectHelper.IsSimpleType(methodSymbol.ReturnType) == false;
         }
 
-        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<INamedTypeSymbol> typeMappers)
         {
-            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly, typeMappers);
             var targetType = methodSymbol.ReturnType;
             var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), methodSymbol.ContainingType, targetType);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };

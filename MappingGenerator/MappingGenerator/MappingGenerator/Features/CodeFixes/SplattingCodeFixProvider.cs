@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Composition;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MappingGenerator.Mappings;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.MethodHelpers;
@@ -14,13 +8,18 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MappingGenerator.Features.CodeFixes
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SplattingCodeFixProvider)), Shared]
     public class SplattingCodeFixProvider : CodeFixProvider
     {
-
         public const string CS7036 = nameof(CS7036);
         public const string CS1501 = nameof(CS1501);
 
@@ -36,7 +35,7 @@ namespace MappingGenerator.Features.CodeFixes
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
             var diagnostic = context.Diagnostics.First();
             var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
-            
+
             var expression = token.Parent.FindNearestContainer<InvocationExpressionSyntax, ObjectCreationExpressionSyntax>();
 
             if (expression != null)
@@ -46,8 +45,8 @@ namespace MappingGenerator.Features.CodeFixes
                     if (creationExpression.ArgumentList?.Arguments.Count == 1)
                     {
                         var invocation = new ConstructorInvocation(creationExpression);
-                        context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters"+"_constructor"), diagnostic);
-                        context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, true, c), equivalenceKey: "Generate splatting with named parameters"+"_constructor"), diagnostic);
+                        context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters" + "_constructor"), diagnostic);
+                        context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, true, c), equivalenceKey: "Generate splatting with named parameters" + "_constructor"), diagnostic);
                     }
                 }
                 else if (expression is InvocationExpressionSyntax invocationExpression)
@@ -70,21 +69,20 @@ namespace MappingGenerator.Features.CodeFixes
             {
                 var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
                 var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
-                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly, Enumerable.Empty<INamedTypeSymbol>());
                 var invalidArgumentList = invocation.Arguments;
                 var parametersMatch = FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator);
                 if (parametersMatch != null)
                 {
                     var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, generateNamedParameters);
                     return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
-                
                 }
             }
 
             return document;
         }
 
-        private static MatchedParameterList FindParametersMatch(ArgumentListSyntax invalidArgumentList, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator) 
+        private static MatchedParameterList FindParametersMatch(ArgumentListSyntax invalidArgumentList, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator)
         {
             var sourceFinder = CreateSourceFinderBasedOnInvalidArgument(invalidArgumentList, semanticModel, syntaxGenerator);
             var parametersMatch = MethodHelper.FindBestParametersMatch(sourceFinder, overloadParameterSets);

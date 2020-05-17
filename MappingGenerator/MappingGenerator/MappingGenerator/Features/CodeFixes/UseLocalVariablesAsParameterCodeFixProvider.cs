@@ -1,8 +1,3 @@
-using System.Collections.Immutable;
-using System.Composition;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MappingGenerator.Mappings;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.MethodHelpers;
@@ -13,6 +8,11 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MappingGenerator.Features.CodeFixes
 {
@@ -30,7 +30,7 @@ namespace MappingGenerator.Features.CodeFixes
             if (overloadParameterSets != null)
             {
                 var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
-                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly, Enumerable.Empty<INamedTypeSymbol>());
                 var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
                 if (parametersMatch != null)
                 {
@@ -54,13 +54,12 @@ namespace MappingGenerator.Features.CodeFixes
         /// No overload for method 'method' takes 'number' arguments
         /// </summary>
         public const string CS1501 = nameof(CS1501);
-        
-        
+
         /// <summary>
-        /// There is no argument given that corresponds to the required formal parameter 
+        /// There is no argument given that corresponds to the required formal parameter
         /// </summary>
         public const string CS7036 = nameof(CS7036);
-        
+
         /// <summary>
         /// type' does not contain a constructor that takes 'number' arguments.
         /// </summary>
@@ -78,7 +77,7 @@ namespace MappingGenerator.Features.CodeFixes
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
             var diagnostic = context.Diagnostics.First();
             var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
-            
+
             var expression = token.Parent.FindNearestContainer<InvocationExpressionSyntax, ObjectCreationExpressionSyntax>();
             if (expression != null)
             {
@@ -92,7 +91,7 @@ namespace MappingGenerator.Features.CodeFixes
                             var methodName = mae.Name.ToFullString();
                             if (methodName == "Select" || methodName == "ConvertAll")
                             {
-                                context.RegisterCodeFix(CodeAction.Create(title: titleWitSelect, createChangedDocument: c => CreateMappingLambda(context.Document, invocationExpression,  c), equivalenceKey: titleWitSelect), diagnostic);
+                                context.RegisterCodeFix(CodeAction.Create(title: titleWitSelect, createChangedDocument: c => CreateMappingLambda(context.Document, invocationExpression, c), equivalenceKey: titleWitSelect), diagnostic);
                             }
                         }
                         else
@@ -101,13 +100,14 @@ namespace MappingGenerator.Features.CodeFixes
                             context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, true, c), equivalenceKey: titleWithNamed), diagnostic);
                         }
                     }
-                }else if (expression is ObjectCreationExpressionSyntax creationExpression)
+                }
+                else if (expression is ObjectCreationExpressionSyntax creationExpression)
                 {
                     if (creationExpression.ArgumentList?.Arguments.Count == 0)
                     {
                         var invocation = new ConstructorInvocation(creationExpression);
-                        context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, false, c), equivalenceKey: title+"for constructor"), diagnostic);
-                        context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, true, c), equivalenceKey: titleWithNamed+"for constructor"), diagnostic);
+                        context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, false, c), equivalenceKey: title + "for constructor"), diagnostic);
+                        context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, true, c), equivalenceKey: titleWithNamed + "for constructor"), diagnostic);
                     }
                 }
             }
@@ -132,7 +132,7 @@ namespace MappingGenerator.Features.CodeFixes
             }
 
             var contextAssembly = semanticModel.FindContextAssembly(invocation);
-            var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+            var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly, Enumerable.Empty<INamedTypeSymbol>());
             var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath());
             return await document.ReplaceNodes(invocation, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
         }
@@ -176,7 +176,7 @@ namespace MappingGenerator.Features.CodeFixes
             }
 
             var typeInfo = semanticModel.GetTypeInfo(sourceNodeParent);
-            if (typeInfo.ConvertedType != null && typeInfo.ConvertedType.Kind != SymbolKind.ErrorType && typeInfo.ConvertedType is INamedTypeSymbol nt && nt.TypeArguments.Length >0 && nt.TypeArguments[0] is INamedTypeSymbol)
+            if (typeInfo.ConvertedType != null && typeInfo.ConvertedType.Kind != SymbolKind.ErrorType && typeInfo.ConvertedType is INamedTypeSymbol nt && nt.TypeArguments.Length > 0 && nt.TypeArguments[0] is INamedTypeSymbol)
                 return nt.TypeArguments[0];
             return GetExpressionType(semanticModel, sourceNodeParent.Parent);
         }
@@ -184,7 +184,7 @@ namespace MappingGenerator.Features.CodeFixes
         private async Task<Document> UseLocalVariablesAsParameters(Document document, IInvocation invocation, bool generateNamedParameters, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var mappingSourceFinder =  LocalScopeMappingSourceFinder.FromScope(semanticModel, invocation.SourceNode);
+            var mappingSourceFinder = LocalScopeMappingSourceFinder.FromScope(semanticModel, invocation.SourceNode);
             return await CodeFixHelper.FixInvocationWithParameters(document, invocation, generateNamedParameters, semanticModel, mappingSourceFinder, cancellationToken);
         }
     }

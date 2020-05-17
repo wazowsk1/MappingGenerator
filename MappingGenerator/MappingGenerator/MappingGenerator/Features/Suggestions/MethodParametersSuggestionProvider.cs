@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MappingGenerator.Mappings;
+﻿using MappingGenerator.Mappings;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.MethodHelpers;
 using MappingGenerator.RoslynHelpers;
@@ -10,6 +7,9 @@ using Microsoft.CodeAnalysis.Completion;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MappingGenerator.Features.Suggestions
 {
@@ -42,8 +42,8 @@ namespace MappingGenerator.Features.Suggestions
             if (!tokenAtCursor.IsKind(SyntaxKind.OpenParenToken)) return;
 
             var callbackArgumentList = tokenAtCursor.Parent as ArgumentListSyntax;
-            
-            if (callbackArgumentList==null || callbackArgumentList.Arguments.Any()) return;
+
+            if (callbackArgumentList == null || callbackArgumentList.Arguments.Any()) return;
 
             var expression = callbackArgumentList.Parent.FindNearestContainer<InvocationExpressionSyntax, ObjectCreationExpressionSyntax>();
             if (expression != null)
@@ -92,7 +92,7 @@ namespace MappingGenerator.Features.Suggestions
             if (overloadParameterSets != null)
             {
                 var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
-                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly, Enumerable.Empty<INamedTypeSymbol>());
                 var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
                 if (parametersMatch != null)
                 {

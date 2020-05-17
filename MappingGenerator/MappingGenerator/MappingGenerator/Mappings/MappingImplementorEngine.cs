@@ -27,12 +27,12 @@ namespace MappingGenerator.Mappings
             return this.implementors.Any(x => x.CanImplement(methodSymbol));
         }
 
-        public IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<INamedTypeSymbol> typeMappers)
         {
             var matchedImplementor = implementors.FirstOrDefault(x => x.CanImplement(methodSymbol));
             if (matchedImplementor != null)
             {
-                return matchedImplementor.GenerateImplementation(methodSymbol, generator, semanticModel);
+                return matchedImplementor.GenerateImplementation(methodSymbol, generator, semanticModel, typeMappers);
             }
             return Enumerable.Empty<SyntaxNode>();
         }
@@ -51,15 +51,15 @@ namespace MappingGenerator.Mappings
             new ThisObjectToOtherMappingMethodImplementor()
         };
 
-        public BlockSyntax GenerateMappingBlock(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public BlockSyntax GenerateMappingBlock(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<INamedTypeSymbol> typeMappers)
         {
-            var mappingStatements = GenerateMappingStatements(methodSymbol, generator, semanticModel);
+            var mappingStatements = GenerateMappingStatements(methodSymbol, generator, semanticModel, typeMappers);
             return SyntaxFactory.Block(mappingStatements).WithAdditionalAnnotations(Formatter.Annotation);
         }
 
-        public IEnumerable<StatementSyntax> GenerateMappingStatements(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<StatementSyntax> GenerateMappingStatements(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<INamedTypeSymbol> typeMappers)
         {
-            var mappingExpressions = GenerateMappingCode(methodSymbol, generator, semanticModel);
+            var mappingExpressions = GenerateMappingCode(methodSymbol, generator, semanticModel, typeMappers);
             var mappingStatements = mappingExpressions.Select(e => e.AsStatement());
             return mappingStatements;
         }

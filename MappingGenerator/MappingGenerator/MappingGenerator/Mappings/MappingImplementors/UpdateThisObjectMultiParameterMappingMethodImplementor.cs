@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using MappingGenerator.Mappings.MappingMatchers;
+﻿using MappingGenerator.Mappings.MappingMatchers;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
+using System.Collections.Generic;
 
 namespace MappingGenerator.Mappings.MappingImplementors
 {
-    class UpdateThisObjectMultiParameterMappingMethodImplementor:IMappingMethodImplementor
+    internal class UpdateThisObjectMultiParameterMappingMethodImplementor : IMappingMethodImplementor
     {
         public bool CanImplement(IMethodSymbol methodSymbol)
         {
@@ -18,9 +18,9 @@ namespace MappingGenerator.Mappings.MappingImplementors
             return methodSymbol.Parameters.Length > 1 && methodSymbol.ReturnsVoid;
         }
 
-        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<INamedTypeSymbol> typeMappers)
         {
-            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly, typeMappers);
             var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
             var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
             return mappingEngine.MapUsingSimpleAssignment(targets, new SingleSourceMatcher(sourceFinder));

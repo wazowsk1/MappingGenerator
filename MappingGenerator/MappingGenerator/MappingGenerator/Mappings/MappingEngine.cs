@@ -18,12 +18,14 @@ namespace MappingGenerator.Mappings
         protected readonly SemanticModel semanticModel;
         protected readonly SyntaxGenerator syntaxGenerator;
         protected readonly IAssemblySymbol contextAssembly;
+        protected readonly IEnumerable<INamedTypeSymbol> typeMappers;
 
-        public MappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly)
+        public MappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly, IEnumerable<INamedTypeSymbol> typeMappers)
         {
             this.semanticModel = semanticModel;
             this.syntaxGenerator = syntaxGenerator;
             this.contextAssembly = contextAssembly;
+            this.typeMappers = typeMappers;
         }
 
         public TypeInfo GetExpressionTypeInfo(SyntaxNode expression)
@@ -35,7 +37,7 @@ namespace MappingGenerator.Mappings
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            return new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+            return new MappingEngine(semanticModel, syntaxGenerator, contextAssembly, Enumerable.Empty<INamedTypeSymbol>());
         }
 
         public MappingForeachElement MapUsingForeachExpression(string sourceName, ITypeSymbol sourceType, ITypeSymbol targetType)
@@ -140,6 +142,11 @@ namespace MappingGenerator.Mappings
                 return TryToUnwrap(targetType, element);
             }
 
+            if (ShouldUseTypeMapper(targetType, sourceType))
+            {
+                return TryToCreateTypeMapperExpression(element, targetType, skipCollections, mappingPath);
+            }
+
             if (ShouldCreateConversionBetweenTypes(targetType, sourceType))
             {
                 return TryToCreateMappingExpression(element, targetType, skipCollections, mappingPath);
@@ -148,9 +155,38 @@ namespace MappingGenerator.Mappings
             return element;
         }
 
+        protected virtual bool ShouldUseTypeMapper(ITypeSymbol targetType, ITypeSymbol sourceType)
+        {
+            return typeMappers.Any(x => x.GetMembers().OfType<IMethodSymbol>().Any(m => targetType.Equals(m.ReturnType) && sourceType.Equals(m.Parameters[0].Type)));
+        }
+
+        protected virtual MappingElement TryToCreateTypeMapperExpression(MappingElement source, ITypeSymbol targetType, bool skipCollections, MappingPath mappingPath)
+        {
+            foreach (var typeMapper in typeMappers)
+            {
+                foreach (var member in typeMapper.GetMembers().OfType<IMethodSymbol>())
+                {
+                    if (targetType.Equals(member.ReturnType) && source.ExpressionType.Equals(member.Parameters[0].Type))
+                    {
+                        var methodAccess = syntaxGenerator.MemberAccessExpression(SyntaxFactory.IdentifierName(typeMapper.Name), member.Name);
+                        var methodParameters = SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(source.Expression));
+                        var methodExpression = syntaxGenerator.InvocationExpression(methodAccess, methodParameters.Arguments);
+
+                        return new MappingElement
+                        {
+                            ExpressionType = targetType,
+                            Expression = (ExpressionSyntax)methodExpression
+                        };
+                    }
+                }
+            }
+
+            return source;
+        }
+
         protected virtual bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
         {
-            return sourceType.CanBeAssignedTo(targetType) == false && ObjectHelper.IsSimpleType(targetType) == false && ObjectHelper.IsSimpleType(sourceType) == false;
+            return (sourceType.CanBeAssignedTo(targetType) == false && ObjectHelper.IsSimpleType(targetType) == false && ObjectHelper.IsSimpleType(sourceType) == false);
         }
 
         protected virtual MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, bool skipCollections, MappingPath mappingPath)

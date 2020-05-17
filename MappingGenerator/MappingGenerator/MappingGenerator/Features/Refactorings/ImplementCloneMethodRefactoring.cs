@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Composition;
-using System.Threading;
-using System.Threading.Tasks;
 using MappingGenerator.Mappings;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
@@ -11,7 +7,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
+using System.Collections.Generic;
+using System.Composition;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MappingGenerator.Features.Refactorings
 {
@@ -44,9 +44,9 @@ namespace MappingGenerator.Features.Refactorings
         {
             var generator = SyntaxGenerator.GetGenerator(document);
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var methodSymbol =  semanticModel.GetDeclaredSymbol(methodDeclaration);
+            var methodSymbol = semanticModel.GetDeclaredSymbol(methodDeclaration);
             var cloneExpression = CreateCloneExpression(generator, semanticModel, methodSymbol.ReturnType as INamedTypeSymbol);
-            return await document.ReplaceNodes(methodDeclaration.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, cloneExpression)).Body, cancellationToken);
+            return await document.ReplaceNodes(methodDeclaration.Body, ((BaseMethodDeclarationSyntax)generator.MethodDeclaration(methodSymbol, cloneExpression)).Body, cancellationToken);
         }
 
         private bool IsCandidateForCloneMethod(MethodDeclarationSyntax md)
@@ -76,7 +76,7 @@ namespace MappingGenerator.Features.Refactorings
                 var cloneableInterface = SyntaxFactory.ParseTypeName($"System.ICloneable");
                 newClassDeclaration = generator.AddInterfaceType(newClassDeclaration, cloneableInterface.WithAdditionalAnnotations(Formatter.Annotation)) as TypeDeclarationSyntax;
             }
-            
+
             return await document.ReplaceNodes(typeDeclaration, newClassDeclaration, cancellationToken);
         }
 
@@ -84,31 +84,30 @@ namespace MappingGenerator.Features.Refactorings
             TypeDeclarationSyntax typeDeclaration, SemanticModel semanticModel)
         {
             var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration);
-            return generator.MethodDeclaration("Clone", 
+            return generator.MethodDeclaration("Clone",
                 accessibility: Accessibility.Public,
-               
-                statements:CreateCloneExpression(generator, semanticModel, typeSymbol),
+
+                statements: CreateCloneExpression(generator, semanticModel, typeSymbol),
                 returnType: SyntaxFactory.ParseTypeName(typeDeclaration.Identifier.Text))
                 .WithAdditionalAnnotations(Formatter.Annotation) as MethodDeclarationSyntax;
         }
 
         private MethodDeclarationSyntax GenerateCloneMethod(SyntaxGenerator generator)
         {
-            var md = generator.MethodDeclaration("Clone", 
-                statements:new []
+            var md = generator.MethodDeclaration("Clone",
+                statements: new[]
                 {
                     generator.ReturnStatement(generator.InvocationExpression(generator.IdentifierName("Clone")))
                 },
                 returnType: SyntaxFactory.ParseTypeName("object")) as MethodDeclarationSyntax;
             return md.WithExplicitInterfaceSpecifier(
                 SyntaxFactory.ExplicitInterfaceSpecifier(SyntaxFactory.IdentifierName("ICloneable")));
-            
         }
 
         private SyntaxNode[] CreateCloneExpression(SyntaxGenerator generator, SemanticModel semanticModel, INamedTypeSymbol type)
         {
             //TODO: If subtypes contains clone method use it, remember about casting
-            var mappingEngine = new CloneMappingEngine(semanticModel, generator, type.ContainingAssembly);
+            var mappingEngine = new CloneMappingEngine(semanticModel, generator, type.ContainingAssembly, Enumerable.Empty<INamedTypeSymbol>());
             var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), type, type);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
@@ -116,7 +115,6 @@ namespace MappingGenerator.Features.Refactorings
 
     public static class TypeDeclarationExtensions
     {
-
         public static TypeDeclarationSyntax WithMembers(this TypeDeclarationSyntax td, IEnumerable<MemberDeclarationSyntax> newMembers)
         {
             switch (td)

@@ -4,14 +4,15 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MappingGenerator.Mappings
 {
     public class CloneMappingEngine : MappingEngine
     {
-        public CloneMappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly)
-            : base(semanticModel, syntaxGenerator, contextAssembly)
+        public CloneMappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly, IEnumerable<INamedTypeSymbol> typeMappers)
+            : base(semanticModel, syntaxGenerator, contextAssembly, typeMappers)
         {
         }
 

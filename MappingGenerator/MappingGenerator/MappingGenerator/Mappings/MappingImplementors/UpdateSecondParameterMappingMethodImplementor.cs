@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using MappingGenerator.Mappings.MappingMatchers;
+﻿using MappingGenerator.Mappings.MappingMatchers;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
+using System.Collections.Generic;
 
 namespace MappingGenerator.Mappings.MappingImplementors
 {
-    class UpdateSecondParameterMappingMethodImplementor:IMappingMethodImplementor
+    internal class UpdateSecondParameterMappingMethodImplementor : IMappingMethodImplementor
     {
         public bool CanImplement(IMethodSymbol methodSymbol)
         {
@@ -18,9 +18,9 @@ namespace MappingGenerator.Mappings.MappingImplementors
             return methodSymbol.Parameters.Length == 2 && methodSymbol.ReturnsVoid;
         }
 
-        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<INamedTypeSymbol> typeMappers)
         {
-            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly, typeMappers);
             var source = methodSymbol.Parameters[0];
             var target = methodSymbol.Parameters[1];
             var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type, methodSymbol.ContainingAssembly);

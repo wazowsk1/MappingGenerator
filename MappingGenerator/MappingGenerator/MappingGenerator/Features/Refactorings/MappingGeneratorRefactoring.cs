@@ -1,6 +1,3 @@
-using System.Composition;
-using System.Threading;
-using System.Threading.Tasks;
 using MappingGenerator.Mappings;
 using MappingGenerator.MethodHelpers;
 using MappingGenerator.RoslynHelpers;
@@ -10,6 +7,10 @@ using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using System.Composition;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MappingGenerator.Features.Refactorings
 {
@@ -33,11 +34,10 @@ namespace MappingGenerator.Features.Refactorings
             switch (node)
             {
                 case BaseMethodDeclarationSyntax methodDeclaration when IsMappingMethodCandidate(methodDeclaration):
-                    if (methodDeclaration.Parent.Kind() != SyntaxKind.InterfaceDeclaration )
+                    if (methodDeclaration.Parent.Kind() != SyntaxKind.InterfaceDeclaration)
                     {
                         var semanticModel = await context.Document.GetSemanticModelAsync();
                         var methodSymbol = semanticModel.GetDeclaredSymbol(methodDeclaration);
-
 
                         if (MappingImplementorEngine.CanProvideMappingImplementationFor(methodSymbol))
                         {
@@ -48,8 +48,8 @@ namespace MappingGenerator.Features.Refactorings
                     break;
                 case IdentifierNameSyntax _:
                 case ParameterListSyntax _:
-                   await TryToRegisterRefactoring(context, node.Parent);
-                break;
+                    await TryToRegisterRefactoring(context, node.Parent);
+                    break;
             }
         }
 
@@ -73,7 +73,7 @@ namespace MappingGenerator.Features.Refactorings
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             var generator = SyntaxGenerator.GetGenerator(document);
-            var blockSyntax = MappingImplementorEngine.GenerateMappingBlock(methodSymbol, generator, semanticModel);
+            var blockSyntax = MappingImplementorEngine.GenerateMappingBlock(methodSymbol, generator, semanticModel, Enumerable.Empty<INamedTypeSymbol>());
             return await document.ReplaceNodes(methodSyntax, methodSyntax.WithOnlyBody(blockSyntax), cancellationToken);
         }
     }

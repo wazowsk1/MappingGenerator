@@ -1,8 +1,3 @@
-using System.Collections.Generic;
-using System.Composition;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MappingGenerator.Mappings;
 using MappingGenerator.Mappings.MappingMatchers;
 using MappingGenerator.Mappings.SourceFinders;
@@ -14,6 +9,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
+using System.Collections.Generic;
+using System.Composition;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MappingGenerator.Features.Refactorings
 {
@@ -55,7 +55,7 @@ namespace MappingGenerator.Features.Refactorings
             foreach (var localSymbol in localSymbols)
             {
                 var symbolType = semanticModel.GetTypeForSymbol(localSymbol);
-                if (symbolType !=null && ObjectHelper.IsSimpleType(symbolType) == false)
+                if (symbolType != null && ObjectHelper.IsSimpleType(symbolType) == false)
                 {
                     yield return new ObjectMembersMappingSourceFinder(symbolType, SyntaxFactory.IdentifierName(localSymbol.Name), syntaxGenerator);
                 }
@@ -70,8 +70,8 @@ namespace MappingGenerator.Features.Refactorings
             var mappingEngine = await MappingEngine.Create(document, cancellationToken, contextAssembly);
             var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, contextAssembly);
             var statements = mappingEngine.MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, globalTargetAccessor: SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda)))
-                .Select(x=>x.AsStatement().WithTrailingTrivia(SyntaxFactory.EndOfLine("\r\n")));
-            
+                .Select(x => x.AsStatement().WithTrailingTrivia(SyntaxFactory.EndOfLine("\r\n")));
+
             var newLambda = UpdateLambdaBody(lambda, SyntaxFactory.Block(statements)).WithAdditionalAnnotations(Formatter.Annotation);
             return await document.ReplaceNodes(lambda, newLambda, cancellationToken);
         }
@@ -95,6 +95,5 @@ namespace MappingGenerator.Features.Refactorings
                 _ => lambda
             };
         }
-
     }
 }

@@ -1,4 +1,4 @@
-using MappingGenerator.RoslynHelpers;
+﻿using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
@@ -16,9 +16,9 @@ namespace MappingGenerator.Mappings.MappingImplementors
                 ContainsCollectionWithoutSetter(methodSymbol.ReturnType);
         }
 
-        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<INamedTypeSymbol> typeMappers)
         {
-            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly, typeMappers);
             var source = methodSymbol.Parameters[0];
             var targetType = methodSymbol.ReturnType;
 
